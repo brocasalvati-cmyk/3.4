@@ -1,41 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
     <title>Brosal3735 Wk 3 Performance Assessment</title>
     <style>
-        body { font-family: sans-serif; margin: 20px; background-color: #f4f7f6; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        form { background: #e9ecef; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
-        input { margin-bottom: 10px; display: block; width: 95%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background-color: #007bff; color: white; }
-        .btn-add { background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
-        .btn-update { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; display: none; }
-        .action-btn { cursor: pointer; color: #007bff; text-decoration: underline; background: none; border: none; padding: 0; font: inherit; }
-        .delete-btn { color: #dc3545; }
+        body { font-family: sans-serif; padding: 20px; }
+        form { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; width: 300px; }
+        input { margin-bottom: 10px; display: block; width: 100%; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid black; padding: 8px; text-align: left; }
     </style>
 </head>
 <body>
 
-<div class="container">
     <h1>Brosal3735 Wk 3 Performance Assessment</h1>
 
-    <form id="infoForm">
-        <h3>Personal Information Entry</h3>
-        <input type="hidden" id="form_id">
-        <input type="text" id="form_name" placeholder="Full Name" required>
-        <input type="date" id="form_dob" required>
-        <input type="text" id="form_color" placeholder="Favorite Color">
-        <input type="text" id="form_place" placeholder="Favorite Place To Visit">
-        <input type="text" id="form_nickname" placeholder="Nickname">
+    <div id="entryForm">
+        <input type="hidden" id="editIndex">
+        <input type="text" id="name" placeholder="Name">
+        <input type="date" id="dob">
+        <input type="text" id="color" placeholder="Favorite Color">
+        <input type="text" id="place" placeholder="Favorite Place">
+        <input type="text" id="nickname" placeholder="Nickname">
         
-        <button type="button" id="addBtn" class="btn-add" onclick="saveData()">Add New Information</button>
-        <button type="button" id="updateBtn" class="btn-update" onclick="updateData()">Update Stored Information</button>
-    </form>
+        <button type="button" id="submitBtn" onclick="handleAction()">Add New</button>
+    </div>
 
-    <table>
+    <table id="myTable">
         <thead>
             <tr>
                 <th>Name</th>
@@ -46,99 +36,93 @@
                 <th>Actions</th>
             </tr>
         </thead>
-        <tbody id="dataTableBody"></tbody>
+        <tbody id="tableBody"></tbody>
     </table>
-</div>
 
-<script>
-    // Load data from LocalStorage on startup
-    let personalData = JSON.parse(localStorage.getItem('my_db')) || [];
+    <script>
+        // Start with empty data or stored data
+        let dataStore = JSON.parse(localStorage.getItem('wk3Data')) || [];
 
-    function renderTable() {
-        const tbody = document.getElementById('dataTableBody');
-        tbody.innerHTML = "";
-        
-        personalData.forEach((item, index) => {
-            const row = `<tr>
-                <td>${item.name}</td>
-                <td>${item.dob}</td>
-                <td>${item.color}</td>
-                <td>${item.place}</td>
-                <td>${item.nickname}</td>
-                <td>
-                    <button class="action-btn" onclick="editRow(${index})">Edit</button> | 
-                    <button class="action-btn delete-btn" onclick="deleteRow(${index})">Delete</button>
-                </td>
-            </tr>`;
-            tbody.innerHTML += row;
-        });
-        // Save state to LocalStorage
-        localStorage.setItem('my_db', JSON.stringify(personalData));
-    }
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = ""; // Clear existing rows
 
-    function saveData() {
-        const nameVal = document.getElementById('form_name').value;
-        const dobVal = document.getElementById('form_dob').value;
+            dataStore.forEach((item, index) => {
+                const row = `<tr>
+                    <td>${item.name}</td>
+                    <td>${item.dob}</td>
+                    <td>${item.color}</td>
+                    <td>${item.place}</td>
+                    <td>${item.nickname}</td>
+                    <td>
+                        <button onclick="editRow(${index})">Edit</button>
+                        <button onclick="deleteRow(${index})">Delete</button>
+                    </td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
 
-        if (!nameVal || !dobVal) {
-            alert("Please fill in both Name and Date of Birth.");
-            return;
+            // Save back to browser storage
+            localStorage.setItem('wk3Data', JSON.stringify(dataStore));
         }
 
-        const entry = {
-            name: nameVal,
-            dob: dobVal,
-            color: document.getElementById('form_color').value,
-            place: document.getElementById('form_place').value,
-            nickname: document.getElementById('form_nickname').value
-        };
+        function handleAction() {
+            const nameInput = document.getElementById('name').value;
+            const dobInput = document.getElementById('dob').value;
+            const editIdx = document.getElementById('editIndex').value;
 
-        personalData.push(entry);
-        document.getElementById('infoForm').reset();
-        renderTable();
-        alert("Success! Information added.");
-    }
+            if (!nameInput || !dobInput) {
+                alert("Please fill in Name and DOB");
+                return;
+            }
 
-    function deleteRow(index) {
-        if (confirm("Delete this entry?")) {
-            personalData.splice(index, 1);
+            const newEntry = {
+                name: nameInput,
+                dob: dobInput,
+                color: document.getElementById('color').value,
+                place: document.getElementById('place').value,
+                nickname: document.getElementById('nickname').value
+            };
+
+            if (editIdx === "") {
+                // Add mode
+                dataStore.push(newEntry);
+            } else {
+                // Update mode
+                dataStore[editIdx] = newEntry;
+                document.getElementById('editIndex').value = "";
+                document.getElementById('submitBtn').innerText = "Add New";
+            }
+
+            // Clear inputs
+            document.getElementById('name').value = "";
+            document.getElementById('dob').value = "";
+            document.getElementById('color').value = "";
+            document.getElementById('place').value = "";
+            document.getElementById('nickname').value = "";
+
             renderTable();
         }
-    }
 
-    function editRow(index) {
-        const item = personalData[index];
-        document.getElementById('form_id').value = index;
-        document.getElementById('form_name').value = item.name;
-        document.getElementById('form_dob').value = item.dob;
-        document.getElementById('form_color').value = item.color;
-        document.getElementById('form_place').value = item.place;
-        document.getElementById('form_nickname').value = item.nickname;
+        function deleteRow(index) {
+            dataStore.splice(index, 1);
+            renderTable();
+        }
 
-        document.getElementById('addBtn').style.display = "none";
-        document.getElementById('updateBtn').style.display = "inline-block";
-    }
+        function editRow(index) {
+            const item = dataStore[index];
+            document.getElementById('name').value = item.name;
+            document.getElementById('dob').value = item.dob;
+            document.getElementById('color').value = item.color;
+            document.getElementById('place').value = item.place;
+            document.getElementById('nickname').value = item.nickname;
+            
+            document.getElementById('editIndex').value = index;
+            document.getElementById('submitBtn').innerText = "Update";
+        }
 
-    function updateData() {
-        const index = document.getElementById('form_id').value;
-        personalData[index] = {
-            name: document.getElementById('form_name').value,
-            dob: document.getElementById('form_dob').value,
-            color: document.getElementById('form_color').value,
-            place: document.getElementById('form_place').value,
-            nickname: document.getElementById('form_nickname').value
-        };
-
-        document.getElementById('infoForm').reset();
-        document.getElementById('addBtn').style.display = "inline-block";
-        document.getElementById('updateBtn').style.display = "none";
+        // Run this when the page first loads
         renderTable();
-        alert("Entry updated successfully.");
-    }
-
-    // Initial load
-    renderTable();
-</script>
-
+    </script>
 </body>
 </html>
