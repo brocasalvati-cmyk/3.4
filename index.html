@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Brosal3735 Wk 3 Performance Assessment</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; background-color: #f9f9f9; }
+        h1 { color: #333; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #eee; }
+        form { background: #f4f4f4; padding: 20px; border-radius: 8px; border: 1px solid #ccc; max-width: 400px; }
+        input { margin-bottom: 10px; display: block; width: 90%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        .btn-group { margin-top: 10px; }
+        button { padding: 10px 15px; cursor: pointer; border: none; border-radius: 4px; }
+        .btn-add { background-color: #28a745; color: white; }
+        .btn-update { background-color: #007bff; color: white; display: none; }
+        .btn-delete { color: #d9534f; text-decoration: none; cursor: pointer; font-weight: bold; }
+        .btn-edit { background: #6c757d; color: white; padding: 5px 10px; }
+    </style>
+</head>
+<body>
+
+    <h1>Brosal3735 Wk 3 Performance Assessment</h1>
+
+    <form id="infoForm">
+        <h3>Add/Update Information</h3>
+        <input type="hidden" id="form_id">
+        <input type="text" id="form_name" placeholder="Name" required>
+        <input type="date" id="form_dob" required>
+        <input type="text" id="form_color" placeholder="Favorite Color">
+        <input type="text" id="form_place" placeholder="Favorite Place to Visit">
+        <input type="text" id="form_nickname" placeholder="Nickname">
+        
+        <div class="btn-group">
+            <button type="button" id="addBtn" class="btn-add" onclick="saveData()">Add New</button>
+            <button type="button" id="updateBtn" class="btn-update" onclick="updateData()">Update Existing</button>
+        </div>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>DOB</th>
+                <th>Color</th>
+                <th>Place</th>
+                <th>Nickname</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="dataTableBody">
+            </tbody>
+    </table>
+
+    <script>
+        // Initialize Data from LocalStorage or empty array
+        let personalData = JSON.parse(localStorage.getItem('wk3_data')) || [];
+
+        // Function to Display Data in Table
+        function renderTable() {
+            const tbody = document.getElementById('dataTableBody');
+            tbody.innerHTML = "";
+            
+            personalData.forEach((item, index) => {
+                const row = `<tr>
+                    <td>${item.name}</td>
+                    <td>${item.dob}</td>
+                    <td>${item.color}</td>
+                    <td>${item.place}</td>
+                    <td>${item.nickname}</td>
+                    <td>
+                        <button class="btn-edit" onclick="fillForm(${index})">Edit</button> |
